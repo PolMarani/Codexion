@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 22:16:36 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/02 17:37:09 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 01:08:33 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,20 +31,34 @@ void	create_coders(t_dongle *dongles, t_coder *coders,
 	}
 }
 
-void	create_dongles(t_dongle *dongles, int number_of_coders,
+int	create_dongles(t_dongle *dongles, int number_of_coders,
 						int dongle_cooldown)
 {
 	int	i;
+	int free_cont;
 
 	i = 0;
+	free_cont = 0;
 	while (i < number_of_coders)
 	{
 		dongles[i].state = 0;
 		dongles[i].last_release_time = -dongle_cooldown;
 		pthread_mutex_init(&dongles[i].mutex, NULL);
 		pthread_cond_init(&dongles[i].cond, NULL);
+		dongles[i].waiting_queue = malloc(sizeof(int) * number_of_coders);
+		if (!dongles[i].waiting_queue)
+		{
+			while (free_cont < i)
+			{
+				free(dongles[free_cont].waiting_queue);
+				free_cont++;
+			}
+			return (1);	
+		}
+		dongles[i].waiting_cont = 0;
 		i++;
 	}
+	return (0);
 }
 
 int	init_simulation(int argc, char **argv, t_data *data)
@@ -57,8 +71,13 @@ int	init_simulation(int argc, char **argv, t_data *data)
 	parse_params(argv, &data->params);
 	if (allocate_arrays(data) == 1)
 		return (1);
-	create_dongles(data->dongles, data->params.number_of_coders,
-		data->params.dongle_cooldown);
+	if (create_dongles(data->dongles, data->params.number_of_coders,
+		data->params.dongle_cooldown) == 1)
+	{
+		free(data->dongles);
+		free(data->coders);
+		return (1);
+	}
 	create_coders(data->dongles, data->coders, &data->params,
 		data->params.number_of_coders);
 	data->is_simulation_over = 0;

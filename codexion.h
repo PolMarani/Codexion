@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:12:57 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/02 19:20:53 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 01:43:02 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ typedef struct s_dongle
 	pthread_mutex_t	mutex;
 	pthread_cond_t	cond;
 	int				last_release_time;
+	int				*waiting_queue;
+	int				waiting_cont;
 
 }	t_dongle;
 
@@ -76,5 +78,6 @@ void	acquire_dongle(t_dongle *dongle, int dongle_cooldown);
 int		is_simulation_over(t_data *data);
 void	set_simulation_over(t_data *data);
 int	acquire_both_dongles(t_coder *coder);
+void	remove_from_queue(t_dongle *dongle);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/02 19:10:45 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 01:49:16 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,28 @@ void	release_dongle(t_dongle *dongle)
 	pthread_mutex_unlock(&dongle->mutex);
 }
 
-void	acquire_dongle(t_dongle *dongle, int dongle_cooldown)
+void	acquire_dongle(t_dongle *dongle, int coder_id, int dongle_cooldown)
 {
 	long	elapsed;
+	int 	was_queued;
 
+	was_queued = 0;
 	pthread_mutex_lock(&dongle->mutex);
 	elapsed = get_current_time_ms() - dongle->last_release_time;
-	while (dongle->state == 1 || elapsed < dongle_cooldown)
+	if (dongle->state == 1 || elapsed < dongle_cooldown)
+	{
+		dongle->waiting_queue[dongle->waiting_cont] = coder_id;
+		dongle->waiting_cont++;
+		was_queued = 1;
+	}
+	while (dongle->state == 1 || elapsed < dongle_cooldown
+		|| dongle->waiting_queue[0] != coder_id)
 	{
 		pthread_cond_wait(&dongle->cond, &dongle->mutex);
 		elapsed = get_current_time_ms() - dongle->last_release_time;
 	}
+	if (was_queued == 1)
+		remove_from_queue(dongle);
 	dongle->state = 1;
 	pthread_mutex_unlock(&dongle->mutex);
 }
@@ -65,13 +76,17 @@ int	acquire_both_dongles(t_coder *coder)
 	{
 		if (coder->left < coder->right)
 		{
-			acquire_dongle(coder->left, coder->data->params.dongle_cooldown);
-			acquire_dongle(coder->right, coder->data->params.dongle_cooldown);
+			acquire_dongle(coder->left, coder->coder_number,
+				coder->data->params.dongle_cooldown);
+			acquire_dongle(coder->right, coder->coder_number,
+				coder->data->params.dongle_cooldown);
 		}
 		else
 		{
-			acquire_dongle(coder->right, coder->data->params.dongle_cooldown);
-			acquire_dongle(coder->left, coder->data->params.dongle_cooldown);
+			acquire_dongle(coder->right, coder->coder_number,
+							coder->data->params.dongle_cooldown);
+			acquire_dongle(coder->left, coder->coder_number,
+							coder->data->params.dongle_cooldown);
 		}
 	}
 	return (0);
