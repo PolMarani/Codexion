@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   scheduler.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/04 01:41:50 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 01:44:11 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 17:38:57 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	remove_from_queue(t_dongle *dongle)
 {
-	int 	i;
+	int	i;
 
 	i = 0;
 	while (i < dongle->waiting_cont - 1)

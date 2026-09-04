@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:12:57 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 01:43:02 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 17:37:36 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
+# include <unistd.h>
 
 typedef struct s_params
 {
@@ -74,10 +75,10 @@ void	create_dongles(t_dongle *dongles, int number_of_coders,
 			int dongle_cooldown);
 long	get_current_time_ms(void);
 void	release_dongle(t_dongle *dongle);
-void	acquire_dongle(t_dongle *dongle, int dongle_cooldown);
+void	acquire_dongle(t_dongle *dongle, int coder_id, int dongle_cooldown);
 int		is_simulation_over(t_data *data);
 void	set_simulation_over(t_data *data);
-int	acquire_both_dongles(t_coder *coder);
+int		acquire_both_dongles(t_coder *coder);
 void	remove_from_queue(t_dongle *dongle);
 
 #endif

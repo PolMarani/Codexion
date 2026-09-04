@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dongle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 01:49:16 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 17:38:38 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	release_dongle(t_dongle *dongle)
 void	acquire_dongle(t_dongle *dongle, int coder_id, int dongle_cooldown)
 {
 	long	elapsed;
-	int 	was_queued;
+	int		was_queued;
 
 	was_queued = 0;
 	pthread_mutex_lock(&dongle->mutex);
@@ -84,9 +84,9 @@ int	acquire_both_dongles(t_coder *coder)
 		else
 		{
 			acquire_dongle(coder->right, coder->coder_number,
-							coder->data->params.dongle_cooldown);
+				coder->data->params.dongle_cooldown);
 			acquire_dongle(coder->left, coder->coder_number,
-							coder->data->params.dongle_cooldown);
+				coder->data->params.dongle_cooldown);
 		}
 	}
 	return (0);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 22:16:36 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 01:08:33 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 17:39:59 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	create_dongles(t_dongle *dongles, int number_of_coders,
 						int dongle_cooldown)
 {
 	int	i;
-	int free_cont;
+	int	free_cont;
 
 	i = 0;
 	free_cont = 0;
@@ -53,7 +53,7 @@ int	create_dongles(t_dongle *dongles, int number_of_coders,
 				free(dongles[free_cont].waiting_queue);
 				free_cont++;
 			}
-			return (1);	
+			return (1);
 		}
 		dongles[i].waiting_cont = 0;
 		i++;
@@ -72,7 +72,7 @@ int	init_simulation(int argc, char **argv, t_data *data)
 	if (allocate_arrays(data) == 1)
 		return (1);
 	if (create_dongles(data->dongles, data->params.number_of_coders,
-		data->params.dongle_cooldown) == 1)
+			data->params.dongle_cooldown) == 1)
 	{
 		free(data->dongles);
 		free(data->coders);
