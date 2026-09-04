@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   scheduler.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/04 01:41:50 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 17:38:57 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/05 00:01:19 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,4 +23,76 @@ void	remove_from_queue(t_dongle *dongle)
 		i++;
 	}
 	dongle->waiting_cont--;
+}
+
+void	acquire_ordered(t_coder *coder)
+{
+	long	deadline;
+
+	deadline = coder->last_start_compile + coder->data->params.time_to_burnout;
+	if (coder->left < coder->right)
+		{
+			acquire_dongle(coder->left, coder->coder_number,
+				coder->data->params.dongle_cooldown, deadline);
+			acquire_dongle(coder->right, coder->coder_number,
+				coder->data->params.dongle_cooldown, deadline);
+		}
+		else
+		{
+			acquire_dongle(coder->right, coder->coder_number,
+				coder->data->params.dongle_cooldown, deadline);
+			acquire_dongle(coder->left, coder->coder_number,
+				coder->data->params.dongle_cooldown, deadline);
+		}
+}
+
+void	heap_push(t_dongle *dongle, t_waiter waiter)
+{
+	int			i;
+	int			parent;
+	t_waiter	tmp;
+
+	dongle->waiting_queue[dongle->waiting_cont] = waiter;
+	dongle->waiting_cont++;
+	i = dongle->waiting_cont - 1;
+	parent = (i - 1) / 2;
+	while (i > 0
+		&& (dongle->waiting_queue[parent].deadline
+		> dongle->waiting_queue[i].deadline))
+	{
+		tmp = dongle->waiting_queue[i];
+		dongle->waiting_queue[i] = dongle->waiting_queue[parent];
+		dongle->waiting_queue[parent] = tmp;
+		i = parent;
+		parent = (i - 1) / 2;
+	}
+}
+
+t_waiter	heap_pop(t_dongle *dongle)
+{
+	t_waiter	result;
+	int			i;
+	t_waiter	tmp;
+	int 		smallest;
+
+	result = dongle->waiting_queue[0];
+	dongle->waiting_queue[0] = dongle->waiting_queue[dongle->waiting_cont - 1];
+	dongle->waiting_cont--;
+	i = 0;
+	while ((2*i+1) < dongle->waiting_cont)
+	{
+		if (2*i+2 < dongle->waiting_cont
+			&& dongle->waiting_queue[2 * i + 2].deadline
+			< 2 * i + 2 < dongle->waiting_queue[2 * i + 1].deadline)
+			smallest = 2*i+2;
+		else
+			smallest = 2*i+1;
+		if (dongle->waiting_queue[smallest].deadline
+			< dongle->waiting_queue[i].deadline)
+			break;
+		tmp = dongle->waiting_queue[i];
+		dongle->waiting_queue[i] = dongle->waiting_queue[smallest];
+		dongle->waiting_queue[smallest] = tmp;
+		i = smallest;
+	}
 }

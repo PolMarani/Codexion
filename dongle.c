@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dongle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 17:38:38 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 22:28:43 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ void	release_dongle(t_dongle *dongle)
 	pthread_mutex_unlock(&dongle->mutex);
 }
 
-void	acquire_dongle(t_dongle *dongle, int coder_id, int dongle_cooldown)
+void	acquire_dongle(t_dongle *dongle, int coder_id,
+		int dongle_cooldown, long deadline)
 {
 	long	elapsed;
 	int		was_queued;
@@ -31,12 +32,13 @@ void	acquire_dongle(t_dongle *dongle, int coder_id, int dongle_cooldown)
 	elapsed = get_current_time_ms() - dongle->last_release_time;
 	if (dongle->state == 1 || elapsed < dongle_cooldown)
 	{
-		dongle->waiting_queue[dongle->waiting_cont] = coder_id;
+		dongle->waiting_queue[dongle->waiting_cont].coder_id = coder_id;
+		dongle->waiting_queue[dongle->waiting_cont].deadline = deadline;
 		dongle->waiting_cont++;
 		was_queued = 1;
 	}
 	while (dongle->state == 1 || elapsed < dongle_cooldown
-		|| dongle->waiting_queue[0] != coder_id)
+		|| dongle->waiting_queue[0].coder_id != coder_id)
 	{
 		pthread_cond_wait(&dongle->cond, &dongle->mutex);
 		elapsed = get_current_time_ms() - dongle->last_release_time;
@@ -72,22 +74,6 @@ int	acquire_both_dongles(t_coder *coder)
 			usleep(1000);
 		return (1);
 	}
-	else if (coder->left != coder->right)
-	{
-		if (coder->left < coder->right)
-		{
-			acquire_dongle(coder->left, coder->coder_number,
-				coder->data->params.dongle_cooldown);
-			acquire_dongle(coder->right, coder->coder_number,
-				coder->data->params.dongle_cooldown);
-		}
-		else
-		{
-			acquire_dongle(coder->right, coder->coder_number,
-				coder->data->params.dongle_cooldown);
-			acquire_dongle(coder->left, coder->coder_number,
-				coder->data->params.dongle_cooldown);
-		}
-	}
+	acquire_ordered(coder);
 	return (0);
 }

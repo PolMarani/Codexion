@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 22:16:36 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 20:41:12 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 22:12:36 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	create_dongles(t_dongle *dongles, int number_of_coders,
 		dongles[i].last_release_time = -dongle_cooldown;
 		pthread_mutex_init(&dongles[i].mutex, NULL);
 		pthread_cond_init(&dongles[i].cond, NULL);
-		dongles[i].waiting_queue = malloc(sizeof(int) * number_of_coders);
+		dongles[i].waiting_queue = malloc(sizeof(t_waiter) * number_of_coders);
 		if (!dongles[i].waiting_queue)
 		{
 			while (free_cont < i)
