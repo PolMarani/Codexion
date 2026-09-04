@@ -1,31 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time_utils.c                                       :+:      :+:    :+:   */
+/*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/09/02 13:17:41 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 20:35:45 by pmarani          ###   ########.fr       */
+/*   Created: 2026/09/04 20:39:04 by pmarani           #+#    #+#             */
+/*   Updated: 2026/09/04 20:53:17 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <sys/time.h>
 
-long	get_current_time_ms(void)
+void    print_status(t_coder *coder, char *str)
 {
-	struct timeval	ms_of_starttime;
+    long    timestamp;
 
-	gettimeofday(&ms_of_starttime, NULL);
-	return (ms_of_starttime.tv_sec * 1000 + ms_of_starttime.tv_usec / 1000);
-}
-
-void	ft_usleep(long time_in_ms)
-{
-	long	start;
-
-	start = get_current_time_ms();
-	while ((get_current_time_ms() - start) < time_in_ms)
-		usleep(500);
+    pthread_mutex_lock(&coder->data->log_mutex);
+    if (is_simulation_over(coder->data) == 0)
+    {
+        timestamp = get_current_time_ms() - coder->data->init_start_time;
+        printf("%ld %d %s\n", timestamp, coder->coder_number, str);
+    }
 }

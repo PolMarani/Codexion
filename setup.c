@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 22:16:36 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 17:39:59 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 20:41:12 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ int	init_simulation(int argc, char **argv, t_data *data)
 		data->params.number_of_coders);
 	data->is_simulation_over = 0;
 	pthread_mutex_init(&data->is_simulation_over_mutex, NULL);
+	pthread_mutex_init(&data->log_mutex, NULL);
 	return (0);
 }
 

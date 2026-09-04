@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:12:57 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 17:37:36 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/04 20:39:48 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ typedef struct s_dongle
 	int				state;
 	pthread_mutex_t	mutex;
 	pthread_cond_t	cond;
-	int				last_release_time;
+	long			last_release_time;
 	int				*waiting_queue;
 	int				waiting_cont;
 
@@ -45,9 +45,10 @@ typedef struct s_dongle
 
 typedef struct s_coder
 {
+	pthread_t	thread;
 	int			coder_number;
 	int			total_compiled;
-	int			last_start_compile;	
+	long		last_start_compile;	
 	t_params	*params;
 	t_dongle	*left;
 	t_dongle	*right;
@@ -63,6 +64,7 @@ typedef struct s_data
 	long			init_start_time;	
 	int				is_simulation_over;
 	pthread_mutex_t	is_simulation_over_mutex;
+	pthread_mutex_t	log_mutex;
 
 }	t_data;
 
@@ -73,6 +75,7 @@ void	create_coders(t_dongle *dongles, t_coder *coders,
 			t_params *params, int number_of_coders);
 void	create_dongles(t_dongle *dongles, int number_of_coders,
 			int dongle_cooldown);
+int		allocate_arrays(t_data *data);
 long	get_current_time_ms(void);
 void	release_dongle(t_dongle *dongle);
 void	acquire_dongle(t_dongle *dongle, int coder_id, int dongle_cooldown);
@@ -80,5 +83,6 @@ int		is_simulation_over(t_data *data);
 void	set_simulation_over(t_data *data);
 int		acquire_both_dongles(t_coder *coder);
 void	remove_from_queue(t_dongle *dongle);
+void	ft_usleep(long time_in_ms);
 
 #endif
