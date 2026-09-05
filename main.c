@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 23:48:29 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 21:34:46 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 00:53:11 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ int	main(int argc, char **argv)
 	if (init_simulation(argc, argv, &data) != 0)
 		return (1);
 	data.init_start_time = get_current_time_ms();
-	i = 0;
 	if (start_threads(&data) != 0)
 	{
 		fprintf(stderr, "Error creating threads\n");
+		cleanup(&data);
 		return (1);
 	}
 	pthread_create(&data.monitor_threads, NULL, monitor_routine, &data);

@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:12:57 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 22:12:04 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 00:02:58 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,14 +55,15 @@ typedef struct s_dongle
 
 typedef struct s_coder
 {
-	pthread_t	thread;
-	int			coder_number;
-	int			total_compiled;
-	long		last_start_compile;	
-	t_params	*params;
-	t_dongle	*left;
-	t_dongle	*right;
-	t_data		*data;
+	pthread_t		thread;
+	int				coder_number;
+	int				total_compiled;
+	long			last_start_compile;
+	pthread_mutex_t	coder_mutex;
+	t_params		*params;
+	t_dongle		*left;
+	t_dongle		*right;
+	t_data			*data;
 
 }	t_coder;
 
@@ -111,5 +112,6 @@ int			check_coders(t_data *data);
 int			start_threads(t_data *data);
 void		cleanup(t_data *data);
 int			is_burned_out(t_data *data, int i);
+int			is_higher_priority(t_waiter a, t_waiter b);
 
 #endif

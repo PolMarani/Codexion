@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 22:16:36 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 22:22:31 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 00:49:43 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	create_coders(t_dongle *dongles, t_coder *coders,
 		coders[i].coder_number = i + 1;
 		coders[i].total_compiled = 0;
 		coders[i].last_start_compile = get_current_time_ms();
+		pthread_mutex_init(&coders[i].coder_mutex, NULL);
 		coders[i].params = &data->params;
 		coders[i].right = &dongles[i];
 		coders[i].left = &dongles[
@@ -77,6 +78,7 @@ int	init_simulation(int argc, char **argv, t_data *data)
 	{
 		free(data->dongles);
 		free(data->coders);
+		free(data->coder_threads);
 		return (1);
 	}
 	create_coders(data->dongles, data->coders, data,
@@ -119,13 +121,15 @@ int	start_threads(t_data *data)
 	int	i;
 
 	i = 0;
-	while (i < data->coders->params->number_of_coders)
+	while (i < data->params.number_of_coders)
 	{
 		if (pthread_create(&data->coder_threads[i], NULL,
-				coder_routine, &data->coders[i]))
+				coder_routine, &data->coders[i]) != 0)
 		{
 			set_simulation_over(data);
-			break ;
+			while(--i >= 0)
+				pthread_join(data->coder_threads[i], NULL);
+			return (1);
 		}
 		i++;
 	}

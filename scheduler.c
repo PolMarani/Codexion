@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/04 01:41:50 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 11:03:02 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 00:09:03 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ void	acquire_ordered(t_coder *coder)
 {
 	long	deadline;
 
+	pthread_mutex_lock(&coder->coder_mutex);
 	deadline = coder->last_start_compile + coder->data->params.time_to_burnout;
+	pthread_mutex_unlock(&coder->coder_mutex);
 	if (coder->left < coder->right)
 	{
 		acquire_dongle(coder->left, coder->coder_number,
@@ -56,9 +58,8 @@ void	heap_push(t_dongle *dongle, t_waiter waiter)
 	dongle->waiting_cont++;
 	i = dongle->waiting_cont - 1;
 	parent = (i - 1) / 2;
-	while (i > 0
-		&& (dongle->waiting_queue[parent].deadline
-			> dongle->waiting_queue[i].deadline))
+	while (i > 0 && is_higher_priority(dongle->waiting_queue[i],
+				dongle->waiting_queue[parent]))
 	{
 		tmp = dongle->waiting_queue[i];
 		dongle->waiting_queue[i] = dongle->waiting_queue[parent];
@@ -89,13 +90,13 @@ void	sift_down(t_dongle *dongle, int i)
 	while ((2 * i + 1) < dongle->waiting_cont)
 	{
 		if (2 * i + 2 < dongle->waiting_cont
-			&& dongle->waiting_queue[2 * i + 2].deadline
-			< dongle->waiting_queue[2 * i + 1].deadline)
+			&& is_higher_priority(dongle->waiting_queue[2 * i + 2],
+					dongle->waiting_queue[2 * i + 1]))
 			smallest = 2 * i + 2;
 		else
 			smallest = 2 * i + 1;
-		if (dongle->waiting_queue[smallest].deadline
-			>= dongle->waiting_queue[i].deadline)
+		if (!is_higher_priority(dongle->waiting_queue[smallest],
+					dongle->waiting_queue[i]))
 			break ;
 		tmp = dongle->waiting_queue[i];
 		dongle->waiting_queue[i] = dongle->waiting_queue[smallest];

@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:02:25 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/02 00:52:48 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 00:29:15 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@ int	validate_args(int argc, char **argv)
 		if (is_valid_number(argv[i]) == 0)
 			return (0);
 		i++;
+	}
+	if (atoi(argv[1]) <= 0)
+	{
+		fprintf(stderr,
+			"Error: Number of coders must be greater than 0\n");
+		return (0);
 	}
 	if (is_valid_scheduler(argv[i]) == 0)
 		return (0);

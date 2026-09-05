@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 22:26:45 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 00:34:07 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,29 @@ void	release_dongle(t_dongle *dongle)
 void	acquire_dongle(t_dongle *dongle, int coder_id,
 		t_data *data, long deadline)
 {
-	long		elapsed;
-	int			was_queued;
+	long	elapsed;
 
-	was_queued = 0;
 	pthread_mutex_lock(&dongle->mutex);
+	enqueue_coder(dongle, data, coder_id, deadline);
 	elapsed = get_current_time_ms() - dongle->last_release_time;
-	if (dongle->state == 1 || elapsed < data->params.dongle_cooldown)
+	while (is_simulation_over(data) == 0)
 	{
-		enqueue_coder(dongle, data, coder_id, deadline);
-		was_queued = 1;
+		elapsed = get_current_time_ms()	- dongle->last_release_time;
+		if (dongle->state == 0
+				&& dongle->waiting_queue[0].coder_id == coder_id)
+		{
+			if (elapsed >= data->params.dongle_cooldown)
+				break ;
+			pthread_mutex_unlock(&dongle->mutex);
+			ft_usleep(data->params.dongle_cooldown - elapsed);
+			pthread_mutex_lock(&dongle->mutex);
+		}
+		else
+			pthread_cond_wait(&dongle->cond, &dongle->mutex);
 	}
-	while (dongle->state == 1 || elapsed < data->params.dongle_cooldown
-		|| dongle->waiting_queue[0].coder_id != coder_id)
-	{
-		pthread_cond_wait(&dongle->cond, &dongle->mutex);
-		elapsed = get_current_time_ms() - dongle->last_release_time;
-	}
-	if (was_queued == 1)
-		remove_from_queue(dongle);
-	dongle->state = 1;
+	dequeue_coder(dongle, data);
+	if (is_simulation_over(data) == 0)
+		dongle->state = 1;
 	pthread_mutex_unlock(&dongle->mutex);
 }
 
@@ -59,18 +62,27 @@ int	is_simulation_over(t_data *data)
 
 void	set_simulation_over(t_data *data)
 {
+	int	i;
+
 	pthread_mutex_lock(&data->is_simulation_over_mutex);
 	data->is_simulation_over = 1;
 	pthread_mutex_unlock(&data->is_simulation_over_mutex);
+	i = 0;
+	while (i < data->params.number_of_coders)
+	{
+		pthread_mutex_lock(&data->dongles[i].mutex);
+		pthread_cond_broadcast(&data->dongles[i].cond);
+		pthread_mutex_unlock(&data->dongles[i].mutex);
+		i++;
+	}
 }
 
 int	acquire_both_dongles(t_coder *coder)
 {
-	printf("coder trying acquire_both\n");
 	if (coder->left == coder->right)
 	{
 		while (is_simulation_over(coder->data) == 0)
-			usleep(1000);
+			ft_usleep(1);
 		return (1);
 	}
 	acquire_ordered(coder);

@@ -1,0 +1,25 @@
+void	acquire_dongle(t_dongle *dongle, int coder_id,
+		t_data *data, long deadline)
+{
+	long		elapsed;
+	int			was_queued;
+
+	was_queued = 0;
+	pthread_mutex_lock(&dongle->mutex);
+	elapsed = get_current_time_ms() - dongle->last_release_time;
+	if (dongle->state == 1 || elapsed < data->params.dongle_cooldown)
+	{
+		enqueue_coder(dongle, data, coder_id, deadline);
+		was_queued = 1;
+	}
+	while (dongle->state == 1 || elapsed < data->params.dongle_cooldown
+		|| dongle->waiting_queue[0].coder_id != coder_id)
+	{
+		pthread_cond_wait(&dongle->cond, &dongle->mutex);
+		elapsed = get_current_time_ms() - dongle->last_release_time;
+	}
+	if (was_queued == 1)
+		remove_from_queue(dongle);
+	dongle->state = 1;
+	pthread_mutex_unlock(&dongle->mutex);
+}
