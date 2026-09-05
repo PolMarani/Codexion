@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/05 12:12:03 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 12:56:20 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/05 22:12:22 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,8 @@ int	check_coders(t_data *data)
 	all_done = 1;
 	while (i < data->params.number_of_coders)
 	{
-		if (get_current_time_ms() - data->coders[i].last_start_compile
-			> data->params.time_to_burnout)
-		{
-			print_status(&data->coders[i], "burned out");
-			set_simulation_over(data);
+		if (is_burned_out(data, i) == 1)
 			return (1);
-		}
 		if (data->coders[i].total_compiled
 			< data->params.number_of_compiles_required)
 			all_done = 0;
@@ -53,4 +48,17 @@ int	check_coders(t_data *data)
 		return (2);
 	}
 	i = 0;
+	return (0);
+}
+
+int	is_burned_out(t_data *data, int i)
+{
+	if (get_current_time_ms() - data->coders[i].last_start_compile
+		> data->params.time_to_burnout)
+	{
+		print_status(&data->coders[i], "burned out");
+		set_simulation_over(data);
+		return (1);
+	}
+	return (0);
 }

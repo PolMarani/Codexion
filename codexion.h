@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:12:57 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 12:55:25 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/05 22:12:04 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@
 # include <stdio.h>
 # include <string.h>
 # include <unistd.h>
+
+typedef struct s_coder	t_coder;
+typedef struct s_data	t_data;
 
 typedef struct s_params
 {
@@ -32,6 +35,13 @@ typedef struct s_params
 
 }	t_params;
 
+typedef struct s_waiter
+{
+	int		coder_id;
+	long	deadline;
+
+}	t_waiter;
+
 typedef struct s_dongle
 {
 	int				state;
@@ -42,13 +52,6 @@ typedef struct s_dongle
 	int				waiting_cont;
 
 }	t_dongle;
-
-typedef struct s_waiter
-{
-	int		coder_id;
-	long	deadline;
-
-}	t_waiter;
 
 typedef struct s_coder
 {
@@ -72,6 +75,8 @@ typedef struct s_data
 	int				is_simulation_over;
 	pthread_mutex_t	is_simulation_over_mutex;
 	pthread_mutex_t	log_mutex;
+	pthread_t		*coder_threads;
+	pthread_t		monitor_threads;
 
 }	t_data;
 
@@ -79,7 +84,7 @@ int			init_simulation(int argc, char **argv, t_data *data);
 int			validate_args(int argc, char **argv);
 void		parse_params(char **argv, t_params *params);
 void		create_coders(t_dongle *dongles, t_coder *coders,
-				t_params *params, int number_of_coders);
+				t_data *data, int number_of_coders);
 int			create_dongles(t_dongle *dongles, int number_of_coders,
 				int dongle_cooldown);
 int			allocate_arrays(t_data *data);
@@ -99,8 +104,12 @@ void		sift_down(t_dongle *dongle, int i);
 void		enqueue_coder(t_dongle *dongle, t_data *data,
 				int coder_id, long deadline);
 void		dequeue_coder(t_dongle *dongle, t_data *data);
+void		*coder_routine(void *arg);
 void		print_status(t_coder *coder, char *str);
 void		*monitor_routine(void *args);
 int			check_coders(t_data *data);
+int			start_threads(t_data *data);
+void		cleanup(t_data *data);
+int			is_burned_out(t_data *data, int i);
 
 #endif

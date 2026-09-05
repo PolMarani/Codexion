@@ -1,9 +1,13 @@
 NAME = codexion
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
-SRCS = dongle.c \
+SRCS = cleanup.c \
+		dongle.c \
 		main.c \
+		monitor.c \
 		parsing.c \
+		routine.c \
+		scheduler_tools.c \
 		scheduler.c \
 		setup.c \
 		time_utils.c
@@ -15,6 +19,8 @@ all: $(NAME)
 $(NAME): $(OBJS)
 		$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 		rm -f $(OBJS)

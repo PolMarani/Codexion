@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/05 11:31:39 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/05 22:26:45 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void	set_simulation_over(t_data *data)
 
 int	acquire_both_dongles(t_coder *coder)
 {
+	printf("coder trying acquire_both\n");
 	if (coder->left == coder->right)
 	{
 		while (is_simulation_over(coder->data) == 0)

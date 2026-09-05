@@ -6,14 +6,14 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 22:16:36 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 22:12:36 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/05 22:22:31 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
 void	create_coders(t_dongle *dongles, t_coder *coders,
-					t_params *params, int number_of_coders)
+					t_data *data, int number_of_coders)
 {
 	int			i;
 
@@ -22,11 +22,12 @@ void	create_coders(t_dongle *dongles, t_coder *coders,
 	{
 		coders[i].coder_number = i + 1;
 		coders[i].total_compiled = 0;
-		coders[i].last_start_compile = 0;
-		coders[i].params = params;
+		coders[i].last_start_compile = get_current_time_ms();
+		coders[i].params = &data->params;
 		coders[i].right = &dongles[i];
 		coders[i].left = &dongles[
 			(i - 1 + number_of_coders) % number_of_coders];
+		coders[i].data = data;
 		i++;
 	}
 }
@@ -78,7 +79,7 @@ int	init_simulation(int argc, char **argv, t_data *data)
 		free(data->coders);
 		return (1);
 	}
-	create_coders(data->dongles, data->coders, &data->params,
+	create_coders(data->dongles, data->coders, data,
 		data->params.number_of_coders);
 	data->is_simulation_over = 0;
 	pthread_mutex_init(&data->is_simulation_over_mutex, NULL);
@@ -100,6 +101,33 @@ int	allocate_arrays(t_data *data)
 		fprintf(stderr, "Error in creating malloc coders\n");
 		free(data->dongles);
 		return (1);
+	}
+	data->coder_threads = malloc(sizeof(pthread_t)
+			* data->params.number_of_coders);
+	if (!data->coder_threads)
+	{
+		fprintf(stderr, "Error in creating malloc threads of the coders\n");
+		free(data->dongles);
+		free(data->coders);
+		return (1);
+	}
+	return (0);
+}
+
+int	start_threads(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->coders->params->number_of_coders)
+	{
+		if (pthread_create(&data->coder_threads[i], NULL,
+				coder_routine, &data->coders[i]))
+		{
+			set_simulation_over(data);
+			break ;
+		}
+		i++;
 	}
 	return (0);
 }
