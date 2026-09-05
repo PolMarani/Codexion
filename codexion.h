@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:12:57 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 23:23:14 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/05 12:55:25 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,23 +75,32 @@ typedef struct s_data
 
 }	t_data;
 
-int		init_simulation(int argc, char **argv, t_data *data);
-int		validate_args(int argc, char **argv);
-void	parse_params(char **argv, t_params *params);
-void	create_coders(t_dongle *dongles, t_coder *coders,
-			t_params *params, int number_of_coders);
-int		create_dongles(t_dongle *dongles, int number_of_coders,
-			int dongle_cooldown);
-int		allocate_arrays(t_data *data);
-long	get_current_time_ms(void);
-void	release_dongle(t_dongle *dongle);
-void	acquire_dongle(t_dongle *dongle, int coder_id,
-			int dongle_cooldown, long deadline);
-int		is_simulation_over(t_data *data);
-void	set_simulation_over(t_data *data);
-int		acquire_both_dongles(t_coder *coder);
-void	remove_from_queue(t_dongle *dongle);
-void	ft_usleep(long time_in_ms);
-void	acquire_ordered(t_coder *coder);
+int			init_simulation(int argc, char **argv, t_data *data);
+int			validate_args(int argc, char **argv);
+void		parse_params(char **argv, t_params *params);
+void		create_coders(t_dongle *dongles, t_coder *coders,
+				t_params *params, int number_of_coders);
+int			create_dongles(t_dongle *dongles, int number_of_coders,
+				int dongle_cooldown);
+int			allocate_arrays(t_data *data);
+long		get_current_time_ms(void);
+void		release_dongle(t_dongle *dongle);
+void		acquire_dongle(t_dongle *dongle, int coder_id,
+				t_data *data, long deadline);
+int			is_simulation_over(t_data *data);
+void		set_simulation_over(t_data *data);
+int			acquire_both_dongles(t_coder *coder);
+void		remove_from_queue(t_dongle *dongle);
+void		ft_usleep(long time_in_ms);
+void		acquire_ordered(t_coder *coder);
+void		heap_push(t_dongle *dongle, t_waiter waiter);
+t_waiter	heap_pop(t_dongle *dongle);
+void		sift_down(t_dongle *dongle, int i);
+void		enqueue_coder(t_dongle *dongle, t_data *data,
+				int coder_id, long deadline);
+void		dequeue_coder(t_dongle *dongle, t_data *data);
+void		print_status(t_coder *coder, char *str);
+void		*monitor_routine(void *args);
+int			check_coders(t_data *data);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/04 22:28:43 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/05 11:31:39 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,22 +22,20 @@ void	release_dongle(t_dongle *dongle)
 }
 
 void	acquire_dongle(t_dongle *dongle, int coder_id,
-		int dongle_cooldown, long deadline)
+		t_data *data, long deadline)
 {
-	long	elapsed;
-	int		was_queued;
+	long		elapsed;
+	int			was_queued;
 
 	was_queued = 0;
 	pthread_mutex_lock(&dongle->mutex);
 	elapsed = get_current_time_ms() - dongle->last_release_time;
-	if (dongle->state == 1 || elapsed < dongle_cooldown)
+	if (dongle->state == 1 || elapsed < data->params.dongle_cooldown)
 	{
-		dongle->waiting_queue[dongle->waiting_cont].coder_id = coder_id;
-		dongle->waiting_queue[dongle->waiting_cont].deadline = deadline;
-		dongle->waiting_cont++;
+		enqueue_coder(dongle, data, coder_id, deadline);
 		was_queued = 1;
 	}
-	while (dongle->state == 1 || elapsed < dongle_cooldown
+	while (dongle->state == 1 || elapsed < data->params.dongle_cooldown
 		|| dongle->waiting_queue[0].coder_id != coder_id)
 	{
 		pthread_cond_wait(&dongle->cond, &dongle->mutex);
