@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   scheduler.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/04 01:41:50 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 13:06:26 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 18:41:31 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	heap_push(t_dongle *dongle, t_waiter waiter)
 	i = dongle->waiting_cont - 1;
 	parent = (i - 1) / 2;
 	while (i > 0 && is_higher_priority(dongle->waiting_queue[i],
-				dongle->waiting_queue[parent]))
+			dongle->waiting_queue[parent]))
 	{
 		tmp = dongle->waiting_queue[i];
 		dongle->waiting_queue[i] = dongle->waiting_queue[parent];
@@ -95,12 +95,12 @@ void	sift_down(t_dongle *dongle, int i)
 	{
 		if (2 * i + 2 < dongle->waiting_cont
 			&& is_higher_priority(dongle->waiting_queue[2 * i + 2],
-					dongle->waiting_queue[2 * i + 1]))
+				dongle->waiting_queue[2 * i + 1]))
 			smallest = 2 * i + 2;
 		else
 			smallest = 2 * i + 1;
 		if (!is_higher_priority(dongle->waiting_queue[smallest],
-					dongle->waiting_queue[i]))
+				dongle->waiting_queue[i]))
 			break ;
 		tmp = dongle->waiting_queue[i];
 		dongle->waiting_queue[i] = dongle->waiting_queue[smallest];

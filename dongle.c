@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dongle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
+/*   By: pmarani <pmarani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 13:32:23 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 18:40:33 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	acquire_dongle(t_dongle *dongle, int coder_id,
 	{
 		elapsed = get_current_time_ms() - dongle->last_release_time;
 		if (dongle->state == 0
-				&& dongle->waiting_queue[0].coder_id == coder_id)
+			&& dongle->waiting_queue[0].coder_id == coder_id)
 		{
 			if (elapsed >= data->params.dongle_cooldown)
 				break ;
