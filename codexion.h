@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 19:12:57 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 00:02:58 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 13:20:36 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,5 +113,6 @@ int			start_threads(t_data *data);
 void		cleanup(t_data *data);
 int			is_burned_out(t_data *data, int i);
 int			is_higher_priority(t_waiter a, t_waiter b);
+int			start_monitor(t_data *data);
 
 #endif

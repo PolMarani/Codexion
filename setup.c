@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 22:16:36 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 00:49:43 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 13:40:25 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,9 @@ int	create_dongles(t_dongle *dongles, int number_of_coders,
 						int dongle_cooldown)
 {
 	int	i;
-	int	free_cont;
 
-	i = 0;
-	free_cont = 0;
-	while (i < number_of_coders)
+	i = -1;
+	while (++i < number_of_coders)
 	{
 		dongles[i].state = 0;
 		dongles[i].last_release_time = -dongle_cooldown;
@@ -50,15 +48,17 @@ int	create_dongles(t_dongle *dongles, int number_of_coders,
 		dongles[i].waiting_queue = malloc(sizeof(t_waiter) * number_of_coders);
 		if (!dongles[i].waiting_queue)
 		{
-			while (free_cont < i)
+			pthread_mutex_destroy(&dongles[i].mutex);
+			pthread_cond_destroy(&dongles[i].cond);
+			while (i--)
 			{
-				free(dongles[free_cont].waiting_queue);
-				free_cont++;
+				pthread_mutex_destroy(&dongles[i].mutex);
+				pthread_cond_destroy(&dongles[i].cond);
+				free(dongles[i].waiting_queue);
 			}
 			return (1);
 		}
 		dongles[i].waiting_cont = 0;
-		i++;
 	}
 	return (0);
 }
@@ -127,7 +127,7 @@ int	start_threads(t_data *data)
 				coder_routine, &data->coders[i]) != 0)
 		{
 			set_simulation_over(data);
-			while(--i >= 0)
+			while (--i >= 0)
 				pthread_join(data->coder_threads[i], NULL);
 			return (1);
 		}

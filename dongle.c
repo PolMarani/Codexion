@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 13:34:15 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 00:34:07 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 13:32:23 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,9 @@ void	acquire_dongle(t_dongle *dongle, int coder_id,
 
 	pthread_mutex_lock(&dongle->mutex);
 	enqueue_coder(dongle, data, coder_id, deadline);
-	elapsed = get_current_time_ms() - dongle->last_release_time;
 	while (is_simulation_over(data) == 0)
 	{
-		elapsed = get_current_time_ms()	- dongle->last_release_time;
+		elapsed = get_current_time_ms() - dongle->last_release_time;
 		if (dongle->state == 0
 				&& dongle->waiting_queue[0].coder_id == coder_id)
 		{

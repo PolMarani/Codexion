@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/05 12:12:03 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 00:38:22 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 13:20:16 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,29 +26,39 @@ void	*monitor_routine(void *args)
 	return (NULL);
 }
 
-int	check_coders(t_data *data)
+int	check_all_done(t_data *data)
 {
 	int		i;
-	int		all_done;
 	int		total;
 
 	i = 0;
-	all_done = 1;
 	while (i < data->params.number_of_coders)
 	{
-		if (is_burned_out(data, i) == 1)
-			return (1);
 		pthread_mutex_lock(&data->coders[i].coder_mutex);
 		total = data->coders[i].total_compiled;
 		pthread_mutex_unlock(&data->coders[i].coder_mutex);
 		if (total < data->params.number_of_compiles_required)
-			all_done = 0;
+			return (0);
 		i++;
 	}
-	if (all_done == 1)
+	return (1);
+}
+
+int	check_coders(t_data *data)
+{
+	int		i;
+
+	if (check_all_done(data) == 1)
 	{
 		set_simulation_over(data);
 		return (2);
+	}
+	i = 0;
+	while (i < data->params.number_of_coders)
+	{
+		if (is_burned_out(data, i) == 1)
+			return (1);
+		i++;
 	}
 	return (0);
 }
@@ -67,4 +77,21 @@ int	is_burned_out(t_data *data, int i)
 		return (1);
 	}
 	return (0);
+}
+
+int	start_monitor(t_data *data)
+{
+	int	i;
+
+	if (pthread_create(&data->monitor_threads, NULL,
+			monitor_routine, data) == 0)
+		return (0);
+	set_simulation_over(data);
+	i = 0;
+	while (i < data->params.number_of_coders)
+	{
+		pthread_join(data->coder_threads[i], NULL);
+		i++;
+	}
+	return (1);
 }

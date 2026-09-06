@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/04 22:13:32 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 00:12:32 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 13:14:34 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,11 @@ void	*coder_routine(void *arg)
 	{
 		if (acquire_both_dongles(coder) == 1)
 			return (NULL);
+		if (is_simulation_over(coder->data))
+			return (NULL);
 		pthread_mutex_lock(&coder->coder_mutex);
 		coder->last_start_compile = get_current_time_ms();
 		pthread_mutex_unlock(&coder->coder_mutex);
-		print_status(coder, "has taken a dongle");
-		print_status(coder, "has taken a dongle");
 		print_status(coder, "is compiling");
 		ft_usleep(coder->data->params.time_to_compile);
 		release_dongle(coder->left);

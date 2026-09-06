@@ -6,7 +6,7 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/04 01:41:50 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 00:09:03 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 13:06:26 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,15 +36,19 @@ void	acquire_ordered(t_coder *coder)
 	{
 		acquire_dongle(coder->left, coder->coder_number,
 			coder->data, deadline);
+		print_status(coder, "has taken a dongle");
 		acquire_dongle(coder->right, coder->coder_number,
 			coder->data, deadline);
+		print_status(coder, "has taken a dongle");
 	}
 	else
 	{
 		acquire_dongle(coder->right, coder->coder_number,
 			coder->data, deadline);
+		print_status(coder, "has taken a dongle");
 		acquire_dongle(coder->left, coder->coder_number,
 			coder->data, deadline);
+		print_status(coder, "has taken a dongle");
 	}
 }
 

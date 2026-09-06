@@ -6,16 +6,17 @@
 /*   By: pmarani <pmarani@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 23:48:29 by pmarani           #+#    #+#             */
-/*   Updated: 2026/09/06 00:53:11 by pmarani          ###   ########.fr       */
+/*   Updated: 2026/09/06 13:29:16 by pmarani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
+void	join_all(t_data *data);
+
 int	main(int argc, char **argv)
 {
 	t_data	data;
-	int		i;
 
 	if (init_simulation(argc, argv, &data) != 0)
 		return (1);
@@ -26,14 +27,25 @@ int	main(int argc, char **argv)
 		cleanup(&data);
 		return (1);
 	}
-	pthread_create(&data.monitor_threads, NULL, monitor_routine, &data);
-	i = 0;
-	while (i < data.params.number_of_coders)
+	if (start_monitor(&data) != 0)
 	{
-		pthread_join(data.coder_threads[i], NULL);
-		i++;
+		cleanup(&data);
+		return (1);
 	}
-	pthread_join(data.monitor_threads, NULL);
+	join_all(&data);
 	cleanup(&data);
 	return (0);
+}
+
+void	join_all(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->params.number_of_coders)
+	{
+		pthread_join(data->coder_threads[i], NULL);
+		i++;
+	}
+	pthread_join(data->monitor_threads, NULL);
 }
